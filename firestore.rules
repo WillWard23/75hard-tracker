@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to challenges collection
+    // In production, you may want to add more restrictive rules
+    match /challenges/{challengeId} {
+      allow read, write: if true;
+    }
+  }
+}
+

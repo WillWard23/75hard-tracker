@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="200" height="200"><svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1"></stop>
+      <stop offset="100%" style="stop-color:#C44569;stop-opacity:1"></stop>
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect width="200" height="200" rx="45" fill="url(#bgGrad)"></rect>
+  
+  <!-- White scale from above view -->
+  <g transform="translate(100, 100)">
+    <!-- Main scale platform (rounded rectangle from above) -->
+    <rect x="-55" y="-65" width="110" height="130" rx="12" fill="#fff"></rect>
+    
+    <!-- Inner platform detail -->
+    <rect x="-50" y="-60" width="100" height="120" rx="10" fill="#f5f5f5"></rect>
+    
+    <!-- Black display screen at top (slimmer) -->
+    <rect x="-40" y="-50" width="80" height="22" rx="4" fill="#000"></rect>
+    
+    <!-- Cyan 23 on display -->
+    <text x="0" y="-32" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#00CED1" text-anchor="middle">23</text>
+  </g>
+</svg></svg><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
+@media (prefers-color-scheme: dark) { :root { filter: none; } }
+</style></svg>

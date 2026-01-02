@@ -1,28 +1,46 @@
-import { getCurrentDay, toggleDayCompletion } from '../services/challengeService'
+import { getCurrentDay, toggleTaskCompletion } from '../services/challengeService'
+import { getTasksForUser, USER_NAMES, formatTaskName } from '../config/tasks'
 
-export default function Home({ challengeData }) {
+export default function Home({ challengeData, selectedDay, onClearSelectedDay }) {
   const currentDay = getCurrentDay(challengeData.startDate)
-  const todayKey = currentDay.toString()
-  const todayData = challengeData.days?.[todayKey] || {}
-  const user1Complete = todayData.user1 || false
-  const user2Complete = todayData.user2 || false
+  const displayDay = selectedDay !== null ? selectedDay : currentDay
+  const dayKey = displayDay.toString()
+  const dayData = challengeData.days?.[dayKey] || {}
+  const user1Data = dayData.user1 || {}
+  const user2Data = dayData.user2 || {}
+  const user1Tasks = user1Data.tasks || {}
+  const user2Tasks = user2Data.tasks || {}
 
-  const handleToggle = async (userKey) => {
-    if (currentDay < 1 || currentDay > 75) return
-    await toggleDayCompletion(currentDay, userKey)
+  const user1TaskList = getTasksForUser('user1')
+  const user2TaskList = getTasksForUser('user2')
+
+  const handleTaskToggle = async (userKey, taskName) => {
+    if (displayDay < 1 || displayDay > 75) return
+    await toggleTaskCompletion(displayDay, userKey, taskName)
   }
 
   const getProgressPercentage = () => {
-    if (currentDay < 1) return 0
-    if (currentDay > 75) return 100
-    return Math.round((currentDay / 75) * 100)
+    if (displayDay < 1) return 0
+    if (displayDay > 75) return 100
+    return Math.round((displayDay / 75) * 100)
   }
+
+  const isSelectedDay = selectedDay !== null && selectedDay !== currentDay
 
   return (
     <div className="space-y-8">
       <div className="text-center">
+        {isSelectedDay && (
+          <button
+            onClick={onClearSelectedDay}
+            className="mb-4 text-sm text-blue-600 hover:text-blue-800 underline"
+          >
+            ← Back to Today
+          </button>
+        )}
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Day {currentDay > 0 ? currentDay : '--'} of 75
+          Day {displayDay > 0 ? displayDay : '--'} of 75
+          {isSelectedDay && <span className="text-lg text-gray-500 ml-2">(Viewing)</span>}
         </h1>
         <div className="mt-4">
           <div className="w-full bg-gray-200 rounded-full h-3">
@@ -37,102 +55,131 @@ export default function Home({ challengeData }) {
         </div>
       </div>
 
-      {currentDay >= 1 && currentDay <= 75 ? (
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 text-center">
-            Today's Progress
-          </h2>
-          <div className="grid grid-cols-2 gap-6">
-            <div className="text-center">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Abi
-              </label>
-              <button
-                onClick={() => handleToggle('user1')}
-                className={`w-16 h-16 rounded-lg border-2 transition-all ${
-                  user1Complete
-                    ? 'bg-green-500 border-green-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-400 hover:border-gray-400'
-                }`}
-              >
-                {user1Complete ? (
-                  <svg
-                    className="w-8 h-8 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+      {displayDay >= 1 && displayDay <= 75 ? (
+        <div className="space-y-6">
+          {/* Abi's Tasks */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 text-center">
+              {USER_NAMES.user1}'s Tasks
+            </h2>
+            {(() => {
+              const completedCount = user1TaskList.filter(task => user1Tasks[task]).length
+              const totalCount = user1TaskList.length
+              const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
+              return (
+                <div className="mb-4">
+                  <div className="flex justify-between items-center text-sm text-gray-600 mb-1">
+                    <span>{completedCount} of {totalCount} complete</span>
+                    <span>{progressPercent}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )
+            })()}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {user1TaskList.map((task) => {
+                const isComplete = user1Tasks[task] || false
+                return (
+                  <button
+                    key={task}
+                    onClick={() => handleTaskToggle('user1', task)}
+                    className={`
+                      p-4 rounded-lg border-2 transition-all text-center cursor-pointer hover:scale-105
+                      ${isComplete
+                        ? 'bg-green-500 border-green-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+                      }
+                    `}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-8 h-8 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
-              </button>
+                    <div className="font-medium text-sm">{formatTaskName(task)}</div>
+                    {isComplete && (
+                      <svg
+                        className="w-6 h-6 mx-auto mt-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })}
             </div>
+          </div>
 
-            <div className="text-center">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Will
-              </label>
-              <button
-                onClick={() => handleToggle('user2')}
-                className={`w-16 h-16 rounded-lg border-2 transition-all ${
-                  user2Complete
-                    ? 'bg-green-500 border-green-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-400 hover:border-gray-400'
-                }`}
-              >
-                {user2Complete ? (
-                  <svg
-                    className="w-8 h-8 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+          {/* Will's Tasks */}
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2 text-center">
+              {USER_NAMES.user2}'s Tasks
+            </h2>
+            {(() => {
+              const completedCount = user2TaskList.filter(task => user2Tasks[task]).length
+              const totalCount = user2TaskList.length
+              const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
+              return (
+                <div className="mb-4">
+                  <div className="flex justify-between items-center text-sm text-gray-600 mb-1">
+                    <span>{completedCount} of {totalCount} complete</span>
+                    <span>{progressPercent}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progressPercent}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )
+            })()}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {user2TaskList.map((task) => {
+                const isComplete = user2Tasks[task] || false
+                return (
+                  <button
+                    key={task}
+                    onClick={() => handleTaskToggle('user2', task)}
+                    className={`
+                      p-4 rounded-lg border-2 transition-all text-center cursor-pointer hover:scale-105
+                      ${isComplete
+                        ? 'bg-green-500 border-green-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+                      }
+                    `}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-8 h-8 mx-auto"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
-              </button>
+                    <div className="font-medium text-sm">{formatTaskName(task)}</div>
+                    {isComplete && (
+                      <svg
+                        className="w-6 h-6 mx-auto mt-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
-      ) : currentDay > 75 ? (
+      ) : displayDay > 75 ? (
         <div className="bg-white rounded-lg shadow-sm p-6 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             🎉 Challenge Complete! 🎉
@@ -151,4 +198,3 @@ export default function Home({ challengeData }) {
     </div>
   )
 }
-

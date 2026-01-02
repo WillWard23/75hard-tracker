@@ -1,24 +1,42 @@
 import { getCurrentDay, toggleDayCompletion } from '../services/challengeService'
+import { getTasksForUser } from '../config/tasks'
 
-export default function Calendar({ challengeData }) {
+export default function Calendar({ challengeData, onDayClick }) {
   const currentDay = getCurrentDay(challengeData.startDate)
   const days = Array.from({ length: 75 }, (_, i) => i + 1)
 
-  const handleDayClick = async (dayNumber, userKey = null) => {
+  const handleDayClick = (dayNumber) => {
+    // Navigate to Home view for this day
+    if (onDayClick) {
+      onDayClick(dayNumber)
+    }
+  }
+
+  const handleUserToggle = async (dayNumber, userKey) => {
     if (dayNumber > currentDay) return // Can't toggle future days
+    await toggleDayCompletion(dayNumber, userKey)
+  }
+
+  const areAllTasksComplete = (userKey, dayData) => {
+    const userData = dayData[userKey] || {}
+    const tasks = userData.tasks || {}
+    const taskList = getTasksForUser(userKey)
     
-    // If userKey is provided, toggle that specific user
-    // Otherwise, toggle user1 (default behavior)
-    const userToToggle = userKey || 'user1'
-    await toggleDayCompletion(dayNumber, userToToggle)
+    if (taskList.length === 0) return false
+    
+    // Check if all tasks are complete
+    return taskList.every(task => tasks[task] === true)
   }
 
   const getDayStatus = (dayNumber) => {
     const dayKey = dayNumber.toString()
     const dayData = challengeData.days?.[dayKey] || {}
+    const user1Complete = areAllTasksComplete('user1', dayData)
+    const user2Complete = areAllTasksComplete('user2', dayData)
+    
     return {
-      user1: dayData.user1 || false,
-      user2: dayData.user2 || false,
+      user1: user1Complete,
+      user2: user2Complete,
       isToday: dayNumber === currentDay,
       isPast: dayNumber < currentDay,
       isFuture: dayNumber > currentDay
@@ -29,7 +47,7 @@ export default function Calendar({ challengeData }) {
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Calendar View</h1>
-        <p className="text-gray-600">Click a day or user indicator to toggle completion</p>
+        <p className="text-gray-600">Click a day to view details, or click user indicators to toggle completion</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6">
@@ -59,9 +77,8 @@ export default function Calendar({ challengeData }) {
               >
                 <button
                   onClick={() => handleDayClick(dayNumber)}
-                  disabled={status.isFuture}
-                  className="w-full h-full flex flex-col items-center justify-center text-xs font-medium cursor-pointer hover:scale-105 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  title={`Day ${dayNumber}${status.isToday ? ' (Today)' : ''} - Click to toggle Me`}
+                  className="w-full h-full flex flex-col items-center justify-center text-xs font-medium cursor-pointer hover:scale-105"
+                  title={`Day ${dayNumber}${status.isToday ? ' (Today)' : ''} - Click to view details`}
                 >
                   <span
                     className={
@@ -75,7 +92,7 @@ export default function Calendar({ challengeData }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDayClick(dayNumber, 'user1')
+                      handleUserToggle(dayNumber, 'user1')
                     }}
                     disabled={status.isFuture}
                     className={`
@@ -88,7 +105,7 @@ export default function Calendar({ challengeData }) {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      handleDayClick(dayNumber, 'user2')
+                      handleUserToggle(dayNumber, 'user2')
                     }}
                     disabled={status.isFuture}
                     className={`

@@ -7,6 +7,7 @@ import { subscribeToChallenge } from './services/challengeService'
 function App() {
   const [challengeData, setChallengeData] = useState(null)
   const [activeView, setActiveView] = useState('home')
+  const [selectedDay, setSelectedDay] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -33,7 +34,7 @@ function App() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <button
-                onClick={() => setActiveView('home')}
+                onClick={() => { setActiveView('home'); setSelectedDay(null); }}
                 className={`px-4 py-2 text-sm font-medium ${
                   activeView === 'home'
                     ? 'text-blue-600 border-b-2 border-blue-600'
@@ -69,10 +70,10 @@ function App() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeView === 'home' && challengeData && (
-          <Home challengeData={challengeData} />
+          <Home challengeData={challengeData} selectedDay={selectedDay} onClearSelectedDay={() => setSelectedDay(null)} />
         )}
         {activeView === 'calendar' && challengeData && (
-          <Calendar challengeData={challengeData} />
+          <Calendar challengeData={challengeData} onDayClick={(day) => { setSelectedDay(day); setActiveView('home'); }} />
         )}
         {activeView === 'settings' && challengeData && (
           <Settings challengeData={challengeData} />

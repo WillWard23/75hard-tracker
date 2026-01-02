@@ -69,7 +69,7 @@ export function subscribeToChallenge(callback) {
 }
 
 /**
- * Toggle completion for a specific day and user
+ * Toggle completion for a specific day and user (legacy - for backwards compatibility)
  */
 export async function toggleDayCompletion(dayNumber, userKey) {
   const docRef = doc(db, 'challenges', CHALLENGE_DOC_ID)
@@ -85,6 +85,29 @@ export async function toggleDayCompletion(dayNumber, userKey) {
   
   await updateDoc(docRef, {
     [`days.${dayKey}.${userKey}`]: !currentValue
+  })
+}
+
+/**
+ * Toggle completion for a specific task on a specific day and user
+ */
+export async function toggleTaskCompletion(dayNumber, userKey, taskName) {
+  const docRef = doc(db, 'challenges', CHALLENGE_DOC_ID)
+  const docSnap = await getDoc(docRef)
+  
+  if (!docSnap.exists()) {
+    throw new Error('Challenge data not found')
+  }
+  
+  const data = docSnap.data()
+  const dayKey = dayNumber.toString()
+  const dayData = data.days?.[dayKey] || {}
+  const userData = dayData[userKey] || {}
+  const tasks = userData.tasks || {}
+  const currentValue = tasks[taskName] || false
+  
+  await updateDoc(docRef, {
+    [`days.${dayKey}.${userKey}.tasks.${taskName}`]: !currentValue
   })
 }
 

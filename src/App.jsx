@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Home from './components/Home'
 import Calendar from './components/Calendar'
 import Settings from './components/Settings'
+import Weight from './components/Weight'
 import { subscribeToChallenge } from './services/challengeService'
 
 function App() {
@@ -54,6 +55,16 @@ function App() {
                 Calendar
               </button>
               <button
+                onClick={() => setActiveView('weight')}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeView === 'weight'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Weight
+              </button>
+              <button
                 onClick={() => setActiveView('settings')}
                 className={`px-4 py-2 text-sm font-medium ${
                   activeView === 'settings'
@@ -74,6 +85,9 @@ function App() {
         )}
         {activeView === 'calendar' && challengeData && (
           <Calendar challengeData={challengeData} onDayClick={(day) => { setSelectedDay(day); setActiveView('home'); }} />
+        )}
+        {activeView === 'weight' && challengeData && (
+          <Weight challengeData={challengeData} />
         )}
         {activeView === 'settings' && challengeData && (
           <Settings challengeData={challengeData} />

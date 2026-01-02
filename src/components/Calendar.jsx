@@ -1,4 +1,4 @@
-import { getCurrentDay, toggleDayCompletion } from '../services/challengeService'
+import { getCurrentDay } from '../services/challengeService'
 import { getTasksForUser } from '../config/tasks'
 
 export default function Calendar({ challengeData, onDayClick }) {
@@ -10,11 +10,6 @@ export default function Calendar({ challengeData, onDayClick }) {
     if (onDayClick) {
       onDayClick(dayNumber)
     }
-  }
-
-  const handleUserToggle = async (dayNumber, userKey) => {
-    if (dayNumber > currentDay) return // Can't toggle future days
-    await toggleDayCompletion(dayNumber, userKey)
   }
 
   const areAllTasksComplete = (userKey, dayData) => {
@@ -47,7 +42,7 @@ export default function Calendar({ challengeData, onDayClick }) {
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Calendar View</h1>
-        <p className="text-gray-600">Click a day to view details, or click user indicators to toggle completion</p>
+        <p className="text-gray-600">Click a day to view details</p>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm p-6">
@@ -88,34 +83,6 @@ export default function Calendar({ challengeData, onDayClick }) {
                     {dayNumber}
                   </span>
                 </button>
-                <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleUserToggle(dayNumber, 'user1')
-                    }}
-                    disabled={status.isFuture}
-                    className={`
-                      w-2 h-2 rounded-full transition-all
-                      ${status.user1 ? 'bg-white ring-1 ring-white' : 'bg-transparent border border-white/50'}
-                      ${status.isFuture ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-125'}
-                    `}
-                    title="Toggle Me"
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleUserToggle(dayNumber, 'user2')
-                    }}
-                    disabled={status.isFuture}
-                    className={`
-                      w-2 h-2 rounded-full transition-all
-                      ${status.user2 ? 'bg-white ring-1 ring-white' : 'bg-transparent border border-white/50'}
-                      ${status.isFuture ? 'cursor-not-allowed' : 'cursor-pointer hover:scale-125'}
-                    `}
-                    title="Toggle Partner"
-                  />
-                </div>
               </div>
             )
           })}

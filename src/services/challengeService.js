@@ -134,3 +134,22 @@ export async function resetChallenge(newStartDate = null) {
   })
 }
 
+/**
+ * Update weight for a specific day and user
+ */
+export async function updateWeight(dayNumber, userKey, weight) {
+  const docRef = doc(db, 'challenges', CHALLENGE_DOC_ID)
+  const docSnap = await getDoc(docRef)
+  
+  if (!docSnap.exists()) {
+    throw new Error('Challenge data not found')
+  }
+  
+  const dayKey = dayNumber.toString()
+  const weightValue = weight === '' || weight === null ? null : parseFloat(weight)
+  
+  await updateDoc(docRef, {
+    [`days.${dayKey}.${userKey}.weight`]: weightValue
+  })
+}
+

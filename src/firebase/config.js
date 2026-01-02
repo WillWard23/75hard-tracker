@@ -2,13 +2,13 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB3pCVqiQJK0bWM33wqUusLIg1qSCdvIcc",
-  authDomain: "hard-tracker-959dc.firebaseapp.com",
-  projectId: "hard-tracker-959dc",
-  storageBucket: "hard-tracker-959dc.firebasestorage.app",
-  messagingSenderId: "393278886220",
-  appId: "1:393278886220:web:537406922d81d701703fe9",
-  measurementId: "G-PGBP6MKBZ9"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 }
 
 const app = initializeApp(firebaseConfig)

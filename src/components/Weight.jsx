@@ -115,18 +115,16 @@ export default function Weight({ challengeData }) {
               dataKey={USER_NAMES.user1} 
               stroke="#ec4899" 
               strokeWidth={2}
-              dot={{ r: 4, fill: "#ec4899" }}
-              activeDot={{ r: 6 }}
-              connectNulls={true}
+              dot={{ r: 4 }}
+              connectNulls={false}
             />
             <Line 
               type="monotone" 
               dataKey={USER_NAMES.user2} 
               stroke="#3b82f6" 
               strokeWidth={2}
-              dot={{ r: 4, fill: "#3b82f6" }}
-              activeDot={{ r: 6 }}
-              connectNulls={true}
+              dot={{ r: 4 }}
+              connectNulls={false}
             />
           </LineChart>
         </ResponsiveContainer>

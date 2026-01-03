@@ -3,6 +3,7 @@ import Home from './components/Home'
 import Calendar from './components/Calendar'
 import Settings from './components/Settings'
 import Weight from './components/Weight'
+import Calories from './components/Calories'
 import { subscribeToChallenge } from './services/challengeService'
 
 function App() {
@@ -65,6 +66,16 @@ function App() {
                 Weight
               </button>
               <button
+                onClick={() => setActiveView('calories')}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeView === 'calories'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Calories
+              </button>
+              <button
                 onClick={() => setActiveView('settings')}
                 className={`px-4 py-2 text-sm font-medium ${
                   activeView === 'settings'
@@ -88,6 +99,9 @@ function App() {
         )}
         {activeView === 'weight' && challengeData && (
           <Weight challengeData={challengeData} />
+        )}
+        {activeView === 'calories' && challengeData && (
+          <Calories challengeData={challengeData} />
         )}
         {activeView === 'settings' && challengeData && (
           <Settings challengeData={challengeData} />

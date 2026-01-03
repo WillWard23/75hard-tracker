@@ -4,6 +4,7 @@ import Calendar from './components/Calendar'
 import Settings from './components/Settings'
 import Weight from './components/Weight'
 import Calories from './components/Calories'
+import UpdatePrompt from './components/UpdatePrompt'
 import { subscribeToChallenge } from './services/challengeService'
 
 function App() {
@@ -107,6 +108,7 @@ function App() {
           <Settings challengeData={challengeData} />
         )}
       </main>
+      <UpdatePrompt />
     </div>
   )
 }
